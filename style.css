@@ -1,167 +1,151 @@
-/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body Styling */
 body {
     font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
-/* App Container */
+/* Dynamic Background */
+body.default { background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb'); }
+body.clear { background-image: url('https://images.unsplash.com/photo-1501973801540-537f08ccae7b'); }
+body.clouds { background-image: url('https://images.unsplash.com/photo-1499346030926-9a72daac6c63'); }
+body.rain { background-image: url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29'); }
+body.snow { background-image: url('https://images.unsplash.com/photo-1608889175123-68d2d7c59449'); }
+
 .app-container {
-    background-color: rgba(34, 34, 34, 0.8); /* Semi-transparent dark background */
-    padding: 20px;
+    background: rgba(0,0,0,0.75);
+    padding: 25px;
     border-radius: 15px;
     width: 90%;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-    opacity: 0.8; /* Adjust the opacity here */
-}
-
-
-/* Header Styling */
-.app-header h1 {
-    font-size: 2.5rem;
-    color: #ff8c00;
-}
-
-.app-header p {
-    font-size: 1rem;
-    color: #aaa;
-    margin-bottom: 20px;
+    max-width: 500px;
+    color: white;
 }
 
 /* Search Bar */
 .search-container {
     display: flex;
-    justify-content: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-input[type="text"] {
+input {
     padding: 10px;
-    font-size: 1rem;
     border-radius: 25px;
+    background: #444;
     border: none;
     flex: 1;
-    background: #444;
-    color: #fff;
-    outline: none;
-}
-
-input[type="text"]::placeholder {
-    color: #ccc;
+    color: white;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #ff8c00;
-    color: #fff;
-    border: none;
+    padding: 10px 18px;
     border-radius: 25px;
+    border: none;
+    background: #ff8c00;
+    color: white;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: 0.3s;
 }
 
-button:hover {
-    background-color: #cc6b00;
+button:hover { background: #cc6b00; }
+
+.gps-btn {
+    background: #007bff;
 }
 
-/* Current Weather */
-.current-weather {
+.gps-btn:hover {
+    background: #005fcc;
+}
+
+/* Temperature Toggle */
+.toggle-container {
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 20px;
-    background: #333;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    gap: 8px;
+    margin-bottom: 15px;
 }
 
-.current-weather .icon img {
-    width: 80px;
+.switch {
+    position: relative;
+    width: 45px;
+    height: 20px;
 }
 
-.info h2 {
-    font-size: 2rem;
-    color: #ff8c00;
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-.info p {
-    font-size: 1.2rem;
-    margin: 5px 0;
+.slider {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #888;
+    border-radius: 20px;
+    cursor: pointer;
 }
 
-/* Forecast Section */
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 2px;
+    bottom: 1px;
+    background: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background: #ff8c00;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Loader */
+.loader {
+    border: 5px solid #ccc;
+    border-top: 5px solid #ff8c00;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.error-message {
+    background: red;
+    padding: 8px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Forecast */
 .forecast {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .day {
     background: #333;
-    padding: 15px;
-    border-radius: 15px;
+    border-radius: 12px;
+    padding: 10px;
     text-align: center;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-}
-
-.weekday {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #ff8c00;
-}
-
-.day .icon img {
-    width: 50px;
-}
-
-.temp {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #fff;
-}
-
-/* Dynamic Background */
-body.clear {
-    background-image: url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg?cs=srgb&dl=pexels-pixabay-459451.jpg&fm=jpg');
-}
-
-body.clouds {
-    background-image: url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg?cs=srgb&dl=pexels-pixabay-459451.jpg&fm=jpg');
-}
-
-body.rain {
-    background-image: url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg?cs=srgb&dl=pexels-pixabay-459451.jpg&fm=jpg');
-}
-
-body.snow {
-    background-image: url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg?cs=srgb&dl=pexels-pixabay-459451.jpg&fm=jpg');
-}
-
-body.default {
-    background-image: url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg?cs=srgb&dl=pexels-pixabay-459451.jpg&fm=jpg');
-}
-
-body {
-    background-image: url('https://media.istockphoto.com/id/926497236/photo/tropical-sea-in-summer.jpg?s=612x612&w=0&k=20&c=SgT--E-a5_UF4GPVnpC6r1IDtThuDiUHmtTbhHg5zJA=');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
