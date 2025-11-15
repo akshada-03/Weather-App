@@ -40,16 +40,5 @@ Example screenshots:
 
 ---
 
-## 🔑 API Used
 
-OpenWeatherMap API:  
-https://openweathermap.org/api
-
-You used:
-- Current Weather API  
-- 5-day / 3-hour Forecast API  
-
----
-
-## 📂 Folder Structure
 
