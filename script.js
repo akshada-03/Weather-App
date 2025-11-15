@@ -1,60 +1,113 @@
+let currentTempCelsius = null;
+
+// Fetch weather by city
 async function getWeather() {
-    const city = document.getElementById('city').value;
-    const apiKey = 'da5cc509bc967933cf9f957a7a06eb9b'; // Replace with a valid API key
-    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
-    const forecastWeatherUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+    const city = document.getElementById("city").value;
+    if (!city.trim()) return showError("Enter a city name");
 
-    try {
-        // Fetch current weather
-        const currentResponse = await fetch(currentWeatherUrl);
-        const currentData = await currentResponse.json();
+    fetchWeather(`q=${city}`);
+}
 
-        document.getElementById('cityName').textContent = currentData.name;
-        document.getElementById('temperature').textContent = `Temperature: ${currentData.main.temp}°C`;
-        document.getElementById('description').textContent = currentData.weather[0].description;
-
-        const currentIcon = currentData.weather[0].icon;
-        document.querySelector('.current-weather .icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${currentIcon}@2x.png" alt="weather icon">`;
-
-        // Fetch forecast data
-        const forecastResponse = await fetch(forecastWeatherUrl);
-        const forecastData = await forecastResponse.json();
-
-        const forecastDays = document.querySelectorAll('.day');
-        forecastDays.forEach((day, index) => {
-            const forecast = forecastData.list[index * 8]; // 24-hour interval
-            const forecastIcon = forecast.weather[0].icon;
-
-            const weekday = new Date(forecast.dt_txt).toLocaleDateString('en-US', { weekday: 'long' });
-            day.querySelector('.weekday').textContent = weekday;
-            day.querySelector('.icon').innerHTML = `<img src="https://openweathermap.org/img/wn/${forecastIcon}@2x.png" alt="forecast icon">`;
-            day.querySelector('.temp').textContent = `${Math.round(forecast.main.temp)}°C`;
-        });
-    } catch (error) {
-        console.error('Error fetching weather data:', error);
+// GPS Weather
+function getLocationWeather() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            pos => fetchWeather(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`),
+            () => showError("Enable location access!")
+        );
     }
 }
-function changeBackground(condition) {
-    const body = document.body;
-    body.className = ''; // Reset existing classes
 
-    switch (condition) {
-        case 'clear':
-            body.classList.add('clear');
-            break;
-        case 'clouds':
-            body.classList.add('clouds');
-            break;
-        case 'rain':
-            body.classList.add('rain');
-            break;
-        case 'snow':
-            body.classList.add('snow');
-            break;
-        default:
-            body.classList.add('default');
-            break;
+// Main fetch function
+async function fetchWeather(query) {
+    const apiKey = "da5cc509bc967933cf9f957a7a06eb9b";
+    const loader = document.getElementById("loader");
+    loader.style.display = "block";
+
+    try {
+        const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?${query}&appid=${apiKey}&units=metric`
+        );
+
+        const data = await res.json();
+        if (data.cod === "404") return showError("City not found");
+
+        updateCurrentWeather(data);
+        changeBackground(data.weather[0].main.toLowerCase());
+        fetchForecast(query);
+
+    } catch (err) {
+        showError("Unable to fetch data");
     }
 
-    console.log(`Background class applied: ${body.className}`); // Debug log
+    loader.style.display = "none";
+}
+
+// Fetch forecast
+async function fetchForecast(query) {
+    const apiKey = "da5cc509bc967933cf9f957a7a06eb9b";
+    const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?${query}&appid=${apiKey}&units=metric`
+    );
+
+    const data = await res.json();
+    const items = document.querySelectorAll(".day");
+
+    items.forEach((day, i) => {
+        const index = i * 8;
+        if (data.list[index]) {
+            const f = data.list[index];
+            day.querySelector(".weekday").textContent =
+                new Date(f.dt_txt).toLocaleDateString("en-US", { weekday: "long" });
+
+            day.querySelector(".icon").innerHTML =
+                `<img src="https://openweathermap.org/img/wn/${f.weather[0].icon}@2x.png">`;
+
+            day.querySelector(".temp").textContent =
+                `${Math.round(f.main.temp)}°C`;
+        }
+    });
+}
+
+// Update current weather
+function updateCurrentWeather(data) {
+    currentTempCelsius = data.main.temp;
+
+    document.getElementById("cityName").textContent = data.name;
+    document.getElementById("temperature").textContent = `${data.main.temp}°C`;
+    document.getElementById("description").textContent = data.weather[0].description;
+
+    document.querySelector(".current-weather .icon").innerHTML =
+        `<img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png">`;
+}
+
+// Toggle Celsius ↔ Fahrenheit
+document.getElementById("tempToggle").addEventListener("change", function () {
+    const tempEl = document.getElementById("temperature");
+
+    if (this.checked) {
+        const f = (currentTempCelsius * 9/5) + 32;
+        tempEl.textContent = `${f.toFixed(1)}°F`;
+    } else {
+        tempEl.textContent = `${currentTempCelsius}°C`;
+    }
+});
+
+// Error
+function showError(msg) {
+    const e = document.getElementById("error");
+    e.textContent = msg;
+    e.style.display = "block";
+    setTimeout(() => e.style.display = "none", 2500);
+}
+
+// Background
+function changeBackground(condition) {
+    document.body.className = "";
+
+    if (["clear", "clouds", "rain", "snow"].includes(condition)) {
+        document.body.classList.add(condition);
+    } else {
+        document.body.classList.add("default");
+    }
 }
